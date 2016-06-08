@@ -1,4 +1,4 @@
-module Main (..) where
+module Main exposing (..)
 
 -- --------------------------
 -- Exercise 1:
@@ -29,9 +29,8 @@ module Main (..) where
 
 
 import Html exposing (..)
+import Html.App as App
 import Html.Events exposing (onClick)
-import Signal exposing (..)
-import StartApp.Simple as StartApp
 
 
 -- MODEL
@@ -94,13 +93,13 @@ initalModel =
 -- UPDATE
 
 
-type Action
+type Msg
   = Reset
   | Show Model
   | Toggle
 
 
-update : Action -> Model -> Model
+update : Msg -> Model -> Model
 update action model =
   case action of
     Reset ->
@@ -120,7 +119,7 @@ update action model =
 -- VIEW
 
 
-forecastListView : List Weather -> Html
+forecastListView : List Weather -> Html Msg
 forecastListView forecast =
   let
     -- table header
@@ -153,7 +152,7 @@ forecastListView forecast =
       ]
 
 
-forecastDetailView : Weather -> Html
+forecastDetailView : Weather -> Html Msg
 forecastDetailView detail =
   tr
     []
@@ -164,26 +163,26 @@ forecastDetailView detail =
     ]
 
 
-cityView : City -> Html
+cityView : City -> Html Msg
 cityView city =
   h1 [] [ text city ]
 
 
-view : Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   div
     []
     [ button
-        [ onClick address Toggle ]
+        [ onClick Toggle ]
         [ text "Toggle" ]
     , button
-        [ onClick address Reset ]
+        [ onClick Reset ]
         [ text "Reset" ]
     , cityView model.city
     , forecastListView model.forecast
     ]
 
 
-main : Signal Html.Html
+main : Program Never
 main =
-  StartApp.start { model = initalModel, view = view, update = update }
+  App.beginnerProgram { model = initalModel, view = view, update = update }
