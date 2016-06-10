@@ -22,8 +22,7 @@ module Main (..) where
 -- --------------------------
 -- Create an outgoing port that exposes the current forecast. Create an
 -- index.html and embed the elm application in fullscreen mode. Log the
--- received forecast-data to the browser console.   
--- Start elm reactor and check if everything works as exptected.
+-- received forecast-data to the browser console.
 -- 
 -- http://guide.elm-lang.org/interop/javascript.html
 
