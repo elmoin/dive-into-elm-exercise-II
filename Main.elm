@@ -1,4 +1,4 @@
-module Main (..) where
+port module Main exposing (..)
 
 -- --------------------------
 -- Exercise 1:
@@ -29,9 +29,8 @@ module Main (..) where
 
 
 import Html exposing (..)
+import Html.App as App
 import Html.Events exposing (onClick)
-import Signal exposing (..)
-import StartApp.Simple as StartApp
 
 
 -- MODEL
@@ -85,42 +84,42 @@ forecast_berlin =
 -- empty model data
 
 
-initalModel : Model
+initalModel : (Model, Cmd Msg)
 initalModel =
-  forecast_hh
+  (forecast_hh, broadcast forecast_hh)
 
 
 
 -- UPDATE
 
 
-type Action
+type Msg
   = Reset
   | Show Model
   | Toggle
 
 
-update : Action -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
     Reset ->
       initalModel
 
     Show forecast ->
-      forecast
+      (forecast, broadcast forecast)
 
     Toggle ->
       if model == forecast_hh then 
-        forecast_berlin 
+        (forecast_berlin, broadcast model)
       else 
-        forecast_hh
+        (forecast_hh, broadcast model)
 
 
 
 -- VIEW
 
 
-forecastListView : List Weather -> Html
+forecastListView : List Weather -> Html Msg
 forecastListView forecast =
   let
     -- table header
@@ -153,7 +152,7 @@ forecastListView forecast =
       ]
 
 
-forecastDetailView : Weather -> Html
+forecastDetailView : Weather -> Html Msg
 forecastDetailView detail =
   tr
     []
@@ -164,26 +163,33 @@ forecastDetailView detail =
     ]
 
 
-cityView : City -> Html
+cityView : City -> Html Msg
 cityView city =
   h1 [] [ text city ]
 
 
-view : Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   div
     []
     [ button
-        [ onClick address Toggle ]
+        [ onClick Toggle ]
         [ text "Toggle" ]
     , button
-        [ onClick address Reset ]
+        [ onClick Reset ]
         [ text "Reset" ]
     , cityView model.city
     , forecastListView model.forecast
     ]
 
+-- PORT
 
-main : Signal Html.Html
+port broadcast : Model -> Cmd msg
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
+
+main : Program Never
 main =
-  StartApp.start { model = initalModel, view = view, update = update }
+  App.program { init = initalModel, view = view, update = update, subscriptions = subscriptions }
