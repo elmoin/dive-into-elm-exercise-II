@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 -- --------------------------
 -- Exercise 1:
@@ -84,9 +84,9 @@ forecast_berlin =
 -- empty model data
 
 
-initalModel : Model
+initalModel : (Model, Cmd Msg)
 initalModel =
-  forecast_hh
+  (forecast_hh, broadcast forecast_hh)
 
 
 
@@ -99,20 +99,20 @@ type Msg
   | Toggle
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
     Reset ->
       initalModel
 
     Show forecast ->
-      forecast
+      (forecast, broadcast forecast)
 
     Toggle ->
       if model == forecast_hh then 
-        forecast_berlin 
+        (forecast_berlin, broadcast model)
       else 
-        forecast_hh
+        (forecast_hh, broadcast model)
 
 
 
@@ -182,7 +182,14 @@ view model =
     , forecastListView model.forecast
     ]
 
+-- PORT
+
+port broadcast : Model -> Cmd msg
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
 
 main : Program Never
 main =
-  App.beginnerProgram { model = initalModel, view = view, update = update }
+  App.program { init = initalModel, view = view, update = update, subscriptions = subscriptions }

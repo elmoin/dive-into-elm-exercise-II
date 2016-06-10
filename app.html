@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <script type="text/javascript" src="./main-compiled.js"></script>
+  </head>
+  <body>
+    <script>
+      var app = Elm.Main.fullscreen();
+      app.ports.broadcast.subscribe(function(forecast) {
+        console.log(forecast);
+      });
+    </script>
+  </body>
+</html>
