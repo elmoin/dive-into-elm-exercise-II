@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 -- --------------------------
 -- Exercise 1:
@@ -88,30 +88,47 @@ initalModel =
     forecast_hh
 
 
+init : ( Model, Cmd Msg )
+init =
+    ( initalModel, Cmd.none )
+
+
 
 -- UPDATE
 
 
 type Msg
     = Reset
-    | Show Model
     | Toggle
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Reset ->
-            initalModel
-
-        Show forecast ->
-            forecast
+            ( initalModel, Cmd.none )
 
         Toggle ->
-            if model == forecast_hh then
-                forecast_berlin
-            else
-                forecast_hh
+            let
+                forecast =
+                    if model == forecast_hh then
+                        forecast_berlin
+                    else
+                        forecast_hh
+            in
+                ( forecast, currentForcast (forecast) )
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+port currentForcast : Model -> Cmd msg
 
 
 
@@ -176,4 +193,9 @@ view model =
 
 main : Program Never
 main =
-    Html.beginnerProgram { model = initalModel, view = view, update = update }
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
